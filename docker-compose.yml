@@ -2,12 +2,12 @@ version: "3.8"
 
 services:
   tg-headless-client:
-    image: ghcr.io/Sphexi/twingate-custom-client-container:latest  # replace with your GHCR path
+    image: ghcr.io/sphexi/twingate-custom-client-container:latest  
     privileged: true
 
-    # Multi-line JSON service key using YAML literal block
+    
     environment:
-      TWINGATE_SERVICE_KEY: |
+      TWINGATE_SERVICE_KEY: | # Replace with your Twingate service key JSON
         {
           "host": "example.twingate.com",
           "client_id": "YOUR_CLIENT_ID",
