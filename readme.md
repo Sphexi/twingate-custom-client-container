@@ -1,4 +1,3 @@
-````markdown
 # Twingate Linux Headless Client (Docker Image)
 
 This image provides a lightweight, self-contained way to run the **Twingate Linux Client in headless mode** using a Service Key. It exists to simplify deployments where the regular Connector is not appropriate—such as lightweight gateways, utility containers, or environments where the client must run alongside other services. Instead of mounting a Service Key file, you paste the multi-line JSON directly into `docker-compose.yml`, and the container configures itself automatically on startup.
@@ -36,7 +35,7 @@ services:
       - NET_ADMIN
     tty: true
     restart: unless-stopped
-````
+```
 
 ### 3. Start the client
 
