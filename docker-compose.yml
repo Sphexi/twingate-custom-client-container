@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  tg-headless-client:
+    image: ghcr.io/Sphexi/twingate-custom-client-container:latest  # replace with your GHCR path
+    privileged: true
+
+    # Multi-line JSON service key using YAML literal block
+    environment:
+      TWINGATE_SERVICE_KEY: |
+        {
+          "host": "example.twingate.com",
+          "client_id": "YOUR_CLIENT_ID",
+          "client_secret": "YOUR_CLIENT_SECRET",
+          "id": "YOUR_SERVICE_KEY_ID"
+        }
+
+    devices:
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+
+    # For interactive shell: `docker compose exec -it tg-headless-client bash`
+    tty: true
+
+    restart: unless-stopped
