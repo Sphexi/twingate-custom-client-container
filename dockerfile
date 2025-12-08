@@ -22,8 +22,6 @@ ENV KEY_DIR=/etc/twingate-service-key
 ENV KEY_FILE=/etc/twingate-service-key/service-key.json
 ENV TERM=xterm-256color
 
-VOLUME ["/etc/twingate-service-key"]
-
 # Built-in healthcheck using `twingate status`
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
   CMD twingate status 2>&1 | tee /proc/1/fd/1 | grep -q online || exit 1
