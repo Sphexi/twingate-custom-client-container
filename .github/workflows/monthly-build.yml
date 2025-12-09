@@ -33,14 +33,37 @@ jobs:
         run: |
           docker build -t tg-build-temp .
 
-      - name: Extract Twingate client version
+      - name: Debug Twingate install in image
+        run: |
+          echo "Checking twingate inside tg-build-temp..."
+          docker run --rm tg-build-temp sh -lc 'which twingate || echo "twingate not in PATH"; ls -R /usr/local /usr/bin /bin | head -n 100'
+
+      - name: Extract Twingate client version from image
         id: version
         run: |
-          RAW=$(docker run --rm tg-build-temp sh -lc "twingate version | head -n1")
-          echo "RAW OUTPUT: $RAW"
-          CLIENT_VER=$(echo "$RAW" | awk '{print $2}')
+          # Temporarily disable 'exit on error' so we can inspect failures
+          set +e
+          RAW_OUTPUT=$(docker run --rm tg-build-temp sh -lc "twingate version | head -n 1")
+          STATUS=$?
+          set -e
+
+          echo "RAW_OUTPUT (exit $STATUS): $RAW_OUTPUT"
+
+          if [ $STATUS -ne 0 ] || [ -z "$RAW_OUTPUT" ]; then
+            echo "WARNING: Failed to run 'twingate version' in the image."
+            echo "Falling back to 'unknown' client version."
+            CLIENT_VER="unknown"
+          else
+            # Expected: 'twingate 2025.310.174671 | 0.174.0'
+            CLIENT_VER=$(echo "$RAW_OUTPUT" | awk '{print $2}')
+            if [ -z "$CLIENT_VER" ]; then
+              CLIENT_VER="unknown"
+            fi
+          fi
+
+          echo "Parsed client version: $CLIENT_VER"
           echo "TG_CLIENT_VERSION=$CLIENT_VER" >> "$GITHUB_ENV"
-          echo "Client version: $CLIENT_VER"
+
 
       - name: Tag image
         run: |
