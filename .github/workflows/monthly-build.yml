@@ -1,0 +1,47 @@
+name: Monthly image build, tagging, and cleanup
+
+on:
+  schedule:
+    - cron: "0 3 1 * *"
+  workflow_dispatch: {}
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}  
+  KEEP_VERSIONS: 2  
+
+jobs:
+  build-tag-clean:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image locally
+        run: |
+          docker build -t tg-build-temp .
+
+      - name: Extract Twingate client version
+        id: version
+        run: |
+          RAW=$(docker run --rm tg-build-temp sh -lc "twingate version | head -n1")
+          echo "RAW OUTPUT: $RAW"
+          CLIENT_VER=$(echo "$RAW" | awk '{print $2}')
+          echo "TG_CLIENT_VERSION=$CLIENT_VER" >> "$GITHUB_ENV"
+          echo "Client version: $CLIENT_VER"
+
+      - name: Tag image
+        run: |
+          FULL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
