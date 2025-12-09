@@ -50,3 +50,9 @@ docker compose logs -f tg-headless-client
 docker compose exec -it tg-headless-client bash
 twingate status
 ```
+
+---
+## Forking and Customization
+The purpose of this repository is as an example of how to build a custom Twingate headless client container. In its current state that's all it will do, you can load it as a sidecar container to provide Twingate access to other services. However, you could also fork this repository and customize the Dockerfile to add additional services or functionality as needed. You could also self host the image if there is some form of security or compliance requirement to do so.
+
+It has two actions currently, one to build and push the image to GHCR whenever `main` branch is pushed to, and another to build and push the image to GHCR on a monthly basis. Both will tag the image with `latest` and the version of the Twingate client installed in the image. This is done so that you can always pull the latest Twingate client image if you want to stay up to date.
