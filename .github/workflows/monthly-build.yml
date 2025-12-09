@@ -45,3 +45,59 @@ jobs:
       - name: Tag image
         run: |
           FULL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          docker tag tg-build-temp "$FULL:latest"
+          docker tag tg-build-temp "$FULL:tg-client-${TG_CLIENT_VERSION}"
+
+      - name: Push images
+        run: |
+          FULL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+          docker push "$FULL:latest"
+          docker push "$FULL:tg-client-${TG_CLIENT_VERSION}"
+
+      - name: Cleanup old versioned tags
+        run: |
+          FULL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}"
+
+          echo "Fetching all tg-client-* tags..."
+          TAGS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${{ github.event.repository.name }}/versions" | \
+            jq -r '.[].metadata.container.tags[]' | grep '^tg-client-' || true)
+
+          echo "Found tags:"
+          echo "$TAGS"
+
+          # Sort descending by version number (string sort works for YYYY.MMDD.build formats)
+          SORTED=$(echo "$TAGS" | sort -r)
+
+          # Keep the first N tags, delete the rest
+          KEEP=$((KEEP_VERSIONS))
+          TO_DELETE=$(echo "$SORTED" | tail -n +$((KEEP + 1)))
+
+          echo "Tags to keep:"
+          echo "$SORTED" | head -n "$KEEP"
+
+          echo "Tags to delete:"
+          echo "$TO_DELETE"
+
+          if [ -z "$TO_DELETE" ]; then
+            echo "No tags to delete."
+            exit 0
+          fi
+
+          # Delete each old tag through GH API
+          for TAG in $TO_DELETE; do
+            echo "Deleting $TAG ..."
+            
+            VERSION_ID=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${{ github.event.repository.name }}/versions" | \
+              jq -r --arg TAG "$TAG" '.[] | select(.metadata.container.tags[]? == $TAG) | .id')
+
+            if [ -n "$VERSION_ID" ]; then
+              curl -X DELETE \
+                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/${{ github.event.repository.name }}/versions/$VERSION_ID"
+              echo "Deleted version ID $VERSION_ID ($TAG)"
+            else
+              echo "Could not find version ID for tag $TAG"
+            fi
+          done
