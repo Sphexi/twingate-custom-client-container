@@ -52,6 +52,16 @@ twingate status
 ```
 
 ---
+## Health Checks and Container Health
+The container utilizes a `healthcheck` that will run through any scripts in the `/healthchecks.d/` directory every 90 seconds. Each of the scripts should return a `0` exit code if the check passes, or a non-zero exit code if it fails. If any of the checks fail, the container will be marked as unhealthy.
+
+Two example health checks are provided:
+- `00-twingate-status-healthcheck.sh`: Checks that the Twingate client is running and connected.
+- `10-curl-resource-healthcheck.sh`: Attempts to curl a specified internal Resource to ensure connectivity. This is set to `http://example.internal` by default, but you can modify it to point to a resource that makes sense for your environment. Alternatively, you can add a Resource in your Twingate Admin Console with the alias `example.internal` that points to anything (such as google.com) and assign access to the Service. The health check will then attempt to use Twingate to reach that site, and as long as it doesn't fail or return an error, the check will pass.
+
+Any additional checks can be added by placing executable scripts in the `/healthchecks.d/` directory. Make sure they follow the same convention of returning `0` for success and non-zero for failure. Use either of the existing ones as templates, or create your own from scratch.
+
+---
 ## Forking and Customization
 The purpose of this repository is as an example of how to build a custom Twingate headless client container. In its current state that's all it will do, you can load it as a sidecar container to provide Twingate access to other services. However, you could also fork this repository and customize the Dockerfile to add additional services or functionality as needed. You could also self host the image if there is some form of security or compliance requirement to do so.
 
