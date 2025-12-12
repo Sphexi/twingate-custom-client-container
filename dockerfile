@@ -13,7 +13,7 @@ RUN apt-get update \
        iputils-ping \
        procps \
        grep \
-    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists/* 
 
 # Install Twingate Linux client
 RUN curl -fsSL https://binaries.twingate.com/client/linux/install.sh | bash
