@@ -4,7 +4,6 @@ FROM debian:bookworm-slim
 # Install runtime dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       cron \
        curl \
        ca-certificates \
        bash \

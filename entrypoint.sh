@@ -35,20 +35,12 @@ log_with_timestamp "[entrypoint] Setting log level to debug..."
 twingate config log-level debug
 
 log_with_timestamp "[entrypoint] Starting Twingate service..."
-twingate start
+twingate start 2>&1
 
 log_with_timestamp "[entrypoint] Initial status:"
 twingate status || true
 
-CRON_FILE=/etc/cron.d/tg-healthchecks
-cat <<'EOF' > "$CRON_FILE"
-*/5 * * * * root /usr/local/bin/healthchecks.sh >> /var/log/healthchecks.log 2>&1
-EOF
-chmod 0644 "$CRON_FILE"
-
-# Start cron in the background (Debian's cron daemon)
-#/usr/sbin/cron
-
 log_with_timestamp "[entrypoint] Twingate started. Keeping container running."
+
 # Keep container alive; twingate runs as a daemon
 sleep infinity
