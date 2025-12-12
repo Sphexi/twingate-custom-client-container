@@ -31,6 +31,9 @@ ENV TERM=xterm-256color
 
 # Entrypoint
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY healthchecks.sh /usr/local/bin/healthchecks.sh
+COPY healthchecks.d/ /healthchecks.d/
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/healthchecks.sh \
+    && find /healthchecks.d -type f -name '*.sh' -exec chmod +x {} \;
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
