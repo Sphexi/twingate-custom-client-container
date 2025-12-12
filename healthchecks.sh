@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-datetime="date +%Y-%m-%d %H:%M:%S%z"
+datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 FAILED=0
 
 for f in /healthchecks.d/*.sh; do

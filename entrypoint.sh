@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-datetime="date +%Y-%m-%d %H:%M:%S%z"
+datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 KEY_DIR="${KEY_DIR:-/etc/twingate-service-key}"
 KEY_FILE="${KEY_FILE:-$KEY_DIR/service-key.json}"
 

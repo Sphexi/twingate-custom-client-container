@@ -7,7 +7,7 @@
 set -euo pipefail
 
 # Healthcheck parameters
-datetime="date +%Y-%m-%d %H:%M:%S%z"
+datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 MAX_RETRIES=5
 SLEEP_BETWEEN=5
 
