@@ -17,6 +17,6 @@ for f in /healthchecks.d/*.sh; do
 done
 
 if [ "$FAILED" -ne 0 ]; then
-  echo "[healthchecks] One or more checks failed. Forcing container restart by killing PID 1."
-  kill -TERM 1 || kill -KILL 1
+  echo "[healthchecks] One or more checks failed. Forcing container restart by exiting 1."
+  exit 1
 fi

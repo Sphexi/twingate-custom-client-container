@@ -43,7 +43,7 @@ EOF
 chmod 0644 "$CRON_FILE"
 
 # Start cron in the background (Debian's cron daemon)
-/usr/sbin/cron
+#/usr/sbin/cron
 
 echo "[entrypoint] Twingate started. Keeping container running."
 # Keep container alive; twingate runs as a daemon
