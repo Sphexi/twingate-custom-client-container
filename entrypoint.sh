@@ -36,6 +36,17 @@ twingate start
 echo "[entrypoint] Initial status:"
 twingate status || true
 
+# Start cron and register healthcheck job
+echo "[entrypoint] Setting up cron healthcheck..."
+CRON_FILE=/etc/cron.d/tg-healthchecks
+cat <<'EOF' > "$CRON_FILE"
+*/5 * * * * root /usr/local/bin/healthchecks.sh >> /var/log/healthchecks.log 2>&1
+EOF
+chmod 0644 "$CRON_FILE"
+
+# Ensure cron is running (Debian/Ubuntu-style)
+service cron start || cron
+
 echo "[entrypoint] Twingate started. Keeping container running."
 # Keep container alive; twingate runs as a daemon
 sleep infinity
