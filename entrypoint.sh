@@ -35,12 +35,18 @@ log_with_timestamp "[entrypoint] Setting log level to debug..."
 twingate config log-level debug
 
 log_with_timestamp "[entrypoint] Starting Twingate service..."
-twingate start 2>&1
+twingate start
 
 log_with_timestamp "[entrypoint] Initial status:"
 twingate status || true
 
 log_with_timestamp "[entrypoint] Twingate started. Keeping container running."
+
+# After starting Twingate
+LOGFILE="/var/log/twingated.log"
+touch "$LOGFILE"
+log_with_timestamp "[entrypoint] Forwarding Twingate log to stdout..."
+tail -F "$LOGFILE" &
 
 # Keep container alive; twingate runs as a daemon
 sleep infinity
