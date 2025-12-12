@@ -14,7 +14,7 @@ RUN apt-get update \
        grep \
        busybox \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s /bin/busybox /sbin/crond \
+    && ln -s /bin/busybox /sbin/crond
 
 
 # Install Twingate Linux client
