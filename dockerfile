@@ -4,6 +4,7 @@ FROM debian:bookworm-slim
 # Install runtime dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+       cron \
        curl \
        ca-certificates \
        bash \
@@ -12,10 +13,7 @@ RUN apt-get update \
        iputils-ping \
        procps \
        grep \
-       busybox \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s /bin/busybox /sbin/crond
-
 
 # Install Twingate Linux client
 RUN curl -fsSL https://binaries.twingate.com/client/linux/install.sh | bash
