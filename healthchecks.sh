@@ -1,23 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 FAILED=0
+
+log_with_timestamp() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $@"
+}
 
 for f in /healthchecks.d/*.sh; do
   [ -f "$f" ] || continue
   [ -x "$f" ] || chmod +x "$f"
 
-  echo "[healthchecks] $datetime - Running $f..."
+  log_with_timestamp "[healthchecks] Running $f..."
   if ! "$f"; then
-    echo "[healthchecks] $datetime - $f FAILED"
+    log_with_timestamp "[healthchecks] $f FAILED"
     FAILED=1
   else
-    echo "[healthchecks] $datetime - $f OK"
+    log_with_timestamp "[healthchecks] $f OK"
   fi
 done
 
 if [ "$FAILED" -ne 0 ]; then
-  echo "[healthchecks] $datetime - One or more checks failed. Marking container unhealthy."
+  log_with_timestamp "[healthchecks] One or more checks failed. Marking container unhealthy."
   exit 1
 fi

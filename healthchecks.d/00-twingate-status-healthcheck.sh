@@ -7,21 +7,24 @@
 set -euo pipefail
 
 # Healthcheck parameters
-datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 MAX_RETRIES=5
 SLEEP_BETWEEN=5
 
+log_with_timestamp() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $@"
+}
+
 # Main healthcheck loop
 for i in $(seq 1 "$MAX_RETRIES"); do
-    echo "[healthcheck] $datetime - Checking Twingate status (attempt $i of $MAX_RETRIES)..."
+    log_with_timestamp "[healthcheck] Checking Twingate status (attempt $i of $MAX_RETRIES)..."
     if twingate status | grep -q "online"; then
-        echo "[healthcheck] $datetime - Twingate is online."
+        log_with_timestamp "[healthcheck] Twingate is online."
         exit 0
     else
-        echo "[healthcheck] $datetime - Twingate is not online. Retrying in $SLEEP_BETWEEN seconds..."
+        log_with_timestamp "[healthcheck] Twingate is not online. Retrying in $SLEEP_BETWEEN seconds..."
         sleep "$SLEEP_BETWEEN"
     fi
 done
 
-echo "[healthcheck] $datetime - Twingate did not become online after $MAX_RETRIES attempts."
+log_with_timestamp "[healthcheck] Twingate did not become online after $MAX_RETRIES attempts."
 exit 1

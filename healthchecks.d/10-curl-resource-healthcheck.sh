@@ -14,21 +14,24 @@
 set -euo pipefail
 
 # Healthcheck parameters
-datetime=`date "+%Y-%m-%d %H:%M:%S%z"`
 MAX_RETRIES=3
 SLEEP_BETWEEN=5
 
+log_with_timestamp() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $@"
+}
+
 # Main healthcheck loop
 for i in $(seq 1 "$MAX_RETRIES"); do
-    echo "[healthcheck] $datetime - Checking Resource example.internal status (attempt $i of $MAX_RETRIES)..."
+    log_with_timestamp "[healthcheck] Checking Resource example.internal status (attempt $i of $MAX_RETRIES)..."
     if curl -s --max-time 10 http://example.internal >/dev/null; then
-        echo "[healthcheck] $datetime - Resource example.internal is reachable via Twingate."
+        log_with_timestamp "[healthcheck] Resource example.internal is reachable via Twingate."
         exit 0
     else
-        echo "[healthcheck] $datetime - Resource example.internal is not reachable. Retrying in $SLEEP_BETWEEN seconds..."
+        log_with_timestamp "[healthcheck] Resource example.internal is not reachable. Retrying in $SLEEP_BETWEEN seconds..."
         sleep "$SLEEP_BETWEEN"
     fi
 done
 
-echo "[healthcheck] $datetime - Twingate did not become online after $MAX_RETRIES attempts."
+log_with_timestamp "[healthcheck] Twingate did not become online after $MAX_RETRIES attempts."
 exit 1
